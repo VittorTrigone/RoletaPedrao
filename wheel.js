@@ -1,13 +1,13 @@
 /**
  * Canvas Roulette Wheel Engine for Rossi Tattoo Raffle
- * 60 Numbers, High-DPI support, Dynamic Peg Collision & Realistic Deceleration
+ * 60 Numbers, Mobile-Optimized, High-DPI Canvas & Realistic Deceleration
  */
 class RouletteWheel {
   constructor(canvasId, options = {}) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
     this.totalNumbers = options.totalNumbers || 60;
-    this.participants = options.participants || {}; // map number -> name
+    this.drawnNumbers = options.drawnNumbers || []; // list of already drawn numbers
     this.onTick = options.onTick || null;
     this.onFinish = options.onFinish || null;
     this.onNumberPass = options.onNumberPass || null;
@@ -18,9 +18,8 @@ class RouletteWheel {
 
     // Pointer flipper physics
     this.flipperAngle = 0;
-    this.flipperVelocity = 0;
 
-    // Sizing
+    // Sizing & DPI
     this.setupDPI();
     window.addEventListener('resize', () => {
       this.setupDPI();
@@ -32,41 +31,32 @@ class RouletteWheel {
 
   setupDPI() {
     const rect = this.canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    // Set internal resolution for crisp rendering
-    const size = Math.min(rect.width || 600, 700);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5); // Cap at 2.5 for mobile GPU performance
+    const size = Math.max(rect.width || 340, 320);
+    
     this.canvas.width = size * dpr;
     this.canvas.height = size * dpr;
     this.width = size;
     this.height = size;
-    this.radius = size / 2 - 18;
+    this.radius = size / 2 - 14;
     this.centerX = size / 2;
     this.centerY = size / 2;
     this.dpr = dpr;
   }
 
-  setParticipants(participants) {
-    this.participants = participants;
+  setDrawnNumbers(drawnNumbers) {
+    this.drawnNumbers = drawnNumbers;
     if (!this.isSpinning) {
       this.draw();
     }
   }
 
-  /**
-   * Slices are 0 to totalNumbers - 1
-   * Slice i corresponds to number (i + 1)
-   */
   getSliceAngle() {
     return (Math.PI * 2) / this.totalNumbers;
   }
 
-  /**
-   * Returns current number at the top pointer (12 o'clock, -PI/2)
-   */
   getCurrentNumber() {
     const sliceAngle = this.getSliceAngle();
-    // Top pointer is at -Math.PI / 2
-    // Angle in wheel coordinate system under the top pointer:
     let angleUnderPointer = (-Math.PI / 2 - this.rotation) % (Math.PI * 2);
     if (angleUnderPointer < 0) angleUnderPointer += Math.PI * 2;
 
@@ -74,28 +64,16 @@ class RouletteWheel {
     return sliceIndex + 1;
   }
 
-  /**
-   * Calculate rotation needed to stop on targetNumber (1 to 60)
-   * under the top pointer (-PI/2)
-   */
   calculateTargetRotation(targetNumber, extraLaps = 8) {
     const sliceAngle = this.getSliceAngle();
     const targetIndex = targetNumber - 1;
-
-    // Center angle of this slice in initial orientation
     const sliceCenter = (targetIndex + 0.5) * sliceAngle;
 
-    // Slight random variation within slice center (keep within middle 60% of slice)
-    const randomJiggle = (Math.random() - 0.5) * (sliceAngle * 0.55);
-
-    // We want: (-PI/2 - finalRotation) % (2PI) === sliceCenter + randomJiggle
-    // => finalRotation = -PI/2 - (sliceCenter + randomJiggle) + 2PI * k
+    // Slight random jiggle inside slice
+    const randomJiggle = (Math.random() - 0.5) * (sliceAngle * 0.5);
     const baseTargetAngle = -Math.PI / 2 - (sliceCenter + randomJiggle);
 
-    // Current normalized rotation
     const currentRot = this.rotation;
-    
-    // Calculate forward angle
     let target = baseTargetAngle;
     while (target < currentRot + Math.PI * 2 * extraLaps) {
       target += Math.PI * 2;
@@ -104,11 +82,6 @@ class RouletteWheel {
     return target;
   }
 
-  /**
-   * Spin to a specific number
-   * @param {number} targetNumber (1 to 60)
-   * @param {function} onComplete
-   */
   spinTo(targetNumber, onComplete) {
     if (this.isSpinning) return;
     this.isSpinning = true;
@@ -118,30 +91,27 @@ class RouletteWheel {
     }
 
     const startRot = this.rotation;
-    const endRot = this.calculateTargetRotation(targetNumber, 8 + Math.floor(Math.random() * 3));
+    const endRot = this.calculateTargetRotation(targetNumber, 7 + Math.floor(Math.random() * 2));
     const totalDistance = endRot - startRot;
 
-    const duration = 7.5; // seconds for maximum drama and suspense
+    const duration = 7.0; // 7 seconds of suspense
     let startTime = null;
     let lastRot = startRot;
 
-    // Animation frame loop using custom deceleration with bouncy pointer
     const animate = (timestamp) => {
       if (!startTime) startTime = timestamp;
       const elapsed = (timestamp - startTime) / 1000;
       const progress = Math.min(1, elapsed / duration);
 
-      // Custom easing: fast start, long cinematic deceleration (Quintic Out)
-      // 1 - Math.pow(1 - progress, 5)
+      // Quintic Out easing for realistic heavy friction
       const ease = 1 - Math.pow(1 - progress, 5);
       this.rotation = startRot + totalDistance * ease;
 
-      // Calculate instantaneous rotational speed for sounds
       const deltaRot = this.rotation - lastRot;
       lastRot = this.rotation;
       const speedRatio = Math.min(1, deltaRot / (Math.PI / 10));
 
-      // Peg collision check for top pointer
+      // Peg collision for flipper
       const sliceAngle = this.getSliceAngle();
       let angleAtPointer = (-Math.PI / 2 - this.rotation) % (Math.PI * 2);
       if (angleAtPointer < 0) angleAtPointer += Math.PI * 2;
@@ -149,17 +119,14 @@ class RouletteWheel {
 
       if (currentPeg !== this.lastPegIndex) {
         this.lastPegIndex = currentPeg;
-        // Flipper deflection physics
-        this.flipperAngle = -0.35 * Math.min(1.2, speedRatio + 0.4);
+        this.flipperAngle = -0.32 * Math.min(1.2, speedRatio + 0.4);
         if (this.onTick) this.onTick(speedRatio);
         if (this.onNumberPass) {
           this.onNumberPass(this.getCurrentNumber());
         }
       }
 
-      // Flipper spring recovery
-      this.flipperAngle += (0 - this.flipperAngle) * 0.25;
-
+      this.flipperAngle += (0 - this.flipperAngle) * 0.28;
       this.draw();
 
       if (progress < 1) {
@@ -177,27 +144,27 @@ class RouletteWheel {
   }
 
   draw() {
-    const { ctx, canvas, dpr, width, height, centerX, centerY, radius } = this;
+    const { ctx, dpr, width, height, centerX, centerY, radius } = this;
     ctx.save();
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
 
     const sliceAngle = this.getSliceAngle();
 
-    // 1. Outer Neon Glow Ring
+    // 1. Outer Neon Rim
     ctx.save();
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius + 8, 0, Math.PI * 2);
-    ctx.lineWidth = 14;
-    ctx.strokeStyle = '#180829';
+    ctx.arc(centerX, centerY, radius + 6, 0, Math.PI * 2);
+    ctx.lineWidth = 12;
+    ctx.strokeStyle = '#150624';
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius + 4, 0, Math.PI * 2);
-    ctx.lineWidth = 4;
+    ctx.arc(centerX, centerY, radius + 3, 0, Math.PI * 2);
+    ctx.lineWidth = 3.5;
     ctx.strokeStyle = '#a855f7';
     ctx.shadowColor = '#c084fc';
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 14;
     ctx.stroke();
     ctx.restore();
 
@@ -210,7 +177,7 @@ class RouletteWheel {
       const num = i + 1;
       const startAngle = i * sliceAngle;
       const endAngle = startAngle + sliceAngle;
-      const hasBuyer = !!this.participants[num];
+      const isDrawn = this.drawnNumbers.includes(num);
 
       // Slice background
       ctx.beginPath();
@@ -218,17 +185,17 @@ class RouletteWheel {
       ctx.arc(0, 0, radius, startAngle, endAngle);
       ctx.closePath();
 
-      // Alternating deep dark purple / obsidian
-      if (hasBuyer) {
-        // Bought numbers have special subtle purple glow highlight
-        ctx.fillStyle = i % 2 === 0 ? '#3b0764' : '#2e1065';
+      if (isDrawn) {
+        // Gold / dim for already drawn
+        ctx.fillStyle = '#451a03';
       } else {
-        ctx.fillStyle = i % 2 === 0 ? '#190a2b' : '#0e051a';
+        // Alternating vibrant purple & deep obsidian
+        ctx.fillStyle = i % 2 === 0 ? '#380e60' : '#1a072c';
       }
       ctx.fill();
 
-      // Subtle slice separator line
-      ctx.strokeStyle = 'rgba(168, 85, 247, 0.25)';
+      // Divider line
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.3)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
@@ -237,70 +204,55 @@ class RouletteWheel {
       const textAngle = startAngle + sliceAngle / 2;
       ctx.rotate(textAngle);
 
-      // Distance from center for text
-      const textDist = radius * 0.76;
+      const textDist = radius * 0.77;
       ctx.translate(textDist, 0);
-      ctx.rotate(Math.PI / 2); // Orient radial outwards
+      ctx.rotate(Math.PI / 2);
 
-      // Format as "01", "02"
       const numStr = num < 10 ? `0${num}` : `${num}`;
 
-      if (hasBuyer) {
-        ctx.fillStyle = '#f3e8ff';
+      if (isDrawn) {
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 10px Montserrat, sans-serif';
+      } else {
+        ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 11px Montserrat, sans-serif';
         ctx.shadowColor = '#d946ef';
-        ctx.shadowBlur = 6;
-      } else {
-        ctx.fillStyle = 'rgba(216, 180, 254, 0.75)';
-        ctx.font = '600 10px Montserrat, sans-serif';
-        ctx.shadowBlur = 0;
+        ctx.shadowBlur = 5;
       }
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(numStr, 0, 0);
 
-      // Mini indicator dot if participant bought this number
-      if (hasBuyer) {
-        ctx.beginPath();
-        ctx.arc(0, 11, 2, 0, Math.PI * 2);
-        ctx.fillStyle = '#22c55e'; // Green neon dot
-        ctx.shadowColor = '#4ade80';
-        ctx.shadowBlur = 5;
-        ctx.fill();
-      }
-
       ctx.restore();
 
-      // Perimeter Rivets / Pegs
+      // Perimeter Pegs
       const pegX = Math.cos(startAngle) * (radius - 2);
       const pegY = Math.sin(startAngle) * (radius - 2);
       ctx.beginPath();
-      ctx.arc(pegX, pegY, 2.2, 0, Math.PI * 2);
-      ctx.fillStyle = '#e9d5ff';
+      ctx.arc(pegX, pegY, 2, 0, Math.PI * 2);
+      ctx.fillStyle = isDrawn ? '#fbbf24' : '#e9d5ff';
       ctx.shadowColor = '#a855f7';
-      ctx.shadowBlur = 4;
+      ctx.shadowBlur = 3;
       ctx.fill();
     }
 
-    ctx.restore(); // Restore wheel rotation
+    ctx.restore();
 
-    // 3. Center Hub & Tattoo Crown
+    // 3. Center Hub with Crown
     ctx.save();
     ctx.translate(centerX, centerY);
 
-    // Hub outer shadow
     ctx.beginPath();
     ctx.arc(0, 0, radius * 0.28, 0, Math.PI * 2);
-    ctx.fillStyle = '#0f051d';
+    ctx.fillStyle = '#0c0316';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 16;
     ctx.fill();
 
-    // Hub gradient ring
-    const hubGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, radius * 0.26);
-    hubGrad.addColorStop(0, '#3b0764');
-    hubGrad.addColorStop(0.7, '#1e0538');
+    const hubGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, radius * 0.26);
+    hubGrad.addColorStop(0, '#581c87');
+    hubGrad.addColorStop(0.7, '#24083d');
     hubGrad.addColorStop(1, '#090214');
 
     ctx.beginPath();
@@ -313,47 +265,43 @@ class RouletteWheel {
     ctx.fill();
     ctx.stroke();
 
-    // Center Crown Icon & Text
     ctx.shadowBlur = 0;
-    ctx.font = '22px sans-serif';
+    ctx.font = `${Math.round(radius * 0.13)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('👑', 0, -6);
+    ctx.fillText('👑', 0, -4);
 
-    ctx.font = 'bold 9px Montserrat, sans-serif';
-    ctx.fillStyle = '#e9d5ff';
-    ctx.fillText('ROSSI', 0, 13);
+    ctx.font = `bold ${Math.round(radius * 0.05)}px Montserrat, sans-serif`;
+    ctx.fillStyle = '#f5d0fe';
+    ctx.fillText('ROSSI', 0, radius * 0.12);
     ctx.restore();
 
-    // 4. Pointer / Flipper (Top at 12 o'clock, pointing down)
+    // 4. Pointer / Flipper at 12 o'clock
     ctx.save();
     ctx.translate(centerX, centerY - radius + 4);
     ctx.rotate(this.flipperAngle);
 
-    // Glowing Arrow
     ctx.beginPath();
-    ctx.moveTo(0, 22); // Tip pointing down into the wheel
-    ctx.lineTo(-11, -12);
-    ctx.lineTo(11, -12);
+    ctx.moveTo(0, 20);
+    ctx.lineTo(-10, -10);
+    ctx.lineTo(10, -10);
     ctx.closePath();
 
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = '#ec4899';
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 14;
     ctx.fill();
 
     ctx.strokeStyle = '#a855f7';
     ctx.lineWidth = 2.5;
     ctx.stroke();
 
-    // Small jewel in flipper base
     ctx.beginPath();
-    ctx.arc(0, -6, 3.5, 0, Math.PI * 2);
+    ctx.arc(0, -5, 3, 0, Math.PI * 2);
     ctx.fillStyle = '#d946ef';
     ctx.fill();
 
     ctx.restore();
-
     ctx.restore();
   }
 }

@@ -2,37 +2,36 @@
 
 Aplicação web completa, moderna e interativa de roleta para sorteio de rifas de tatuagem, inspirada na identidade visual oficial da **Rossi Tattoo** (fundo escuro, estética grunge/neon roxo e elementos de estúdio).
 
-Pronta para ser hospedada gratuitamente no **GitHub Pages** com zero configuração de servidor!
+Pronta para ser hospedada gratuitamente no **GitHub Pages** e 100% responsiva para celulares!
 
 ---
 
-## 📸 Recursos Principais
+## 📱 Recursos Principais
 
-- **Roleta Dinâmica de 60 Números**:
+- **100% Otimizado para Celulares e Computadores**:
+  - Layout mobile-first responsivo e fluido, com tamanho ideal para telas de smartphones (iPhone, Android) e transmissões ao vivo.
+- **Roleta Dinâmica de 60 Números (01 a 60)**:
+  - Todos os 60 números ativos no giro!
   - Renderizada em HTML5 Canvas de alta resolução (compatível com telas Retina e 4K).
-  - Animação cinematográfica de 7.5 segundos com desaceleração realista e suspense crescente.
-  - Ponteiro articulado com física de ricochete a cada pino que passa.
+  - Animação cinematográfica de ~7 segundos com desaceleração realista e suspense crescente.
+  - Ponteiro articulado no topo com física de ricochete a cada número que passa.
+  - Placar ao vivo no topo mostrando o número apontado em tempo real.
 - **Áudio Sintetizado 100% Procedural (Web Audio API)**:
-  - Cliques mecânicos sincronizados com a velocidade da roleta.
+  - Cliques mecânicos sincronizados com a rotação da roleta.
   - Sub-grave de tensão no disparo.
-  - Fanfarra triunfal com acordes de sintetizador e brilho metálico na revelação do ganhador.
+  - Fanfarra triunfal com acordes de sintetizador na revelação do ganhador.
   - Zero arquivos `.mp3` externos (nunca quebra no GitHub Pages!).
-- **Tabela Interativa de Participantes (01 a 60)**:
-  - 60 crachás circulares neon inspirados no panfleto da rifa.
-  - Clique em qualquer número para cadastrar nome e WhatsApp/Instagram do comprador.
-  - Salvamento automático no `localStorage` (pode atualizar a página que não perde nada!).
-  - Botão de **Preenchimento Demo** (para testar em 1 clique).
-  - Contador dinâmico de números vendidos.
-- **Filtros Inteligentes para Lives**:
-  - *Sortear apenas números comprados*: ideal se nem todos os 60 números forem vendidos até a hora da live.
-  - *Excluir já sorteados*: evita repetições caso sorteie 1º e 2º prêmio.
+- **Placar Interativo (01 a 60)**:
+  - Grid 10x6 de círculos neon idêntico ao panfleto oficial da rifa.
+  - Marca automaticamente os números que já foram sorteados em dourado com brilho comemorativo.
+  - Botão "🔄 Zerar" para reiniciar os sorteios quando quiser.
+- **Filtro "Não repetir já sorteados"**:
+  - Garante que o mesmo número não saia duas vezes (ideal se forem sortear 1º, 2º ou 3º lugar).
 - **Gerador Automático de Stories para Instagram (9:16)**:
   - Ao sair o ganhador, basta clicar em *"Baixar Story pro Instagram"*.
-  - Cria instantaneamente uma imagem em 1080x1920 HD com a arte oficial, número sorteado e nome do vencedor pronta para postar nos stories do `@rossi.tattoo`!
-- **Chuva de Confetes Neon**:
-  - Efeito comemorativo vibrante em tons roxo, dourado e prata.
-- **Modo Tela Cheia (⛶)**:
-  - Para lives no Instagram ou transmissão via OBS Studio sem barras de navegador.
+  - Cria instantaneamente uma imagem em 1080x1920 HD com o número vencedor e a arte oficial da Rossi Tattoo pronta para postar nos stories!
+- **Chuva de Confetes Neon e Modo Tela Cheia (⛶)**:
+  - Para lives no Instagram ou transmissão via OBS sem nenhuma barra do navegador atrapalhando.
 
 ---
 
@@ -52,10 +51,8 @@ Você pode subir os arquivos pelo Git no terminal ou arrastando diretamente no n
 #### Opção A: Pelo Terminal (Git)
 No diretório do projeto:
 ```bash
-git init
 git add .
-git commit -m "feat: Roleta da Rifa Tattoo completa"
-git branch -M main
+git commit -m "feat: Roleta mobile first pura de 60 números"
 git remote add origin https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git
 git push -u origin main
 ```
@@ -74,7 +71,7 @@ git push -u origin main
 ### 3. Ativar o GitHub Pages
 1. No seu repositório no GitHub, clique na aba **Settings** (Configurações).
 2. No menu lateral esquerdo, clique em **Pages**.
-3. Em **Build and deployment > Branch**, selecione a branch `main` (ou `master`) e a pasta `/(root)`.
+3. Em **Build and deployment > Branch**, selecione a branch `main` e a pasta `/(root)`.
 4. Clique em **Save**.
 5. Aguarde cerca de 1 a 2 minutos. O GitHub fornecerá o link público do seu site:
    `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`
@@ -83,18 +80,9 @@ git push -u origin main
 
 ## 💻 Como Rodar Localmente
 
-Para abrir no computador antes de subir:
-- Basta dar dois cliques no arquivo `index.html` para abrir diretamente no Chrome, Edge ou Firefox.
-- Ou se preferir usar uma extensão como o *Live Server* do VS Code / Antigravity.
+Para abrir no celular ou computador:
+- Basta dar dois cliques no arquivo `index.html` para abrir diretamente no Chrome, Safari, Edge ou Firefox.
 
 ---
 
-## 🎨 Personalização Fácil
-
-- **Nome do Estúdio / Tatuador**: Pesquise por `Rossi.tattoo` no `index.html` e `script.js` e troque pelo nome desejado.
-- **Valor da Rifa e Prêmio**: No `index.html`, você pode alterar facilmente os textos de `R$ 10,00` ou `1 TATTOO DA SUA ESCOLHA`.
-- **Cores**: As variáveis principais de cores estão no topo do arquivo `style.css` (`--neon-purple`, `--neon-gold`, etc.).
-
----
-
-Feito com 💜 para tatuadores e sorteios profissionais!
+Feito com 💜 para Rossi Tattoo e sorteios ao vivo no Instagram!

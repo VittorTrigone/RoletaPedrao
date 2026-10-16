@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Roleta da Rifa Tattoo • Rossi Tattoo (01 a 60)</title>
-  <meta name="description" content="Roleta interativa oficial para sorteio da Rifa Tattoo com 60 números. Animação fluida, efeitos sonoros e gerador de stories para Instagram.">
+  <meta name="description" content="Roleta oficial de 60 números para sorteio da Rifa Tattoo. Animação fluida para celular e computador, efeitos sonoros e gerador de stories para Instagram.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👑</text></svg>">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,900&family=Permanent+Marker&family=Rock+Salt&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=Permanent+Marker&family=Rock+Salt&display=swap" rel="stylesheet">
 
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -20,22 +20,21 @@
 </head>
 <body>
 
-  <!-- Background Visual Atmospheres -->
+  <!-- Background Atmospheres -->
   <div class="bg-layer"></div>
   <div class="bg-overlay"></div>
   <canvas id="fx-canvas"></canvas>
 
   <div class="app-container">
     
-    <!-- Top Bar Controls -->
+    <!-- Top Action Bar -->
     <header class="top-bar">
       <div class="brand-badge">
-        <span>👑</span> ROSSI.TATTOO • SORTEIO AO VIVO
+        <span>👑</span> ROSSI.TATTOO
       </div>
       <div class="top-controls">
         <button id="btnSoundToggle" class="icon-btn" title="Ativar/Desativar Som" aria-label="Som">🔊</button>
-        <button id="btnFullscreen" class="icon-btn" title="Modo Tela Cheia (Live / OBS)" aria-label="Tela Cheia">⛶</button>
-        <button id="btnInfo" class="icon-btn" title="Instruções de Uso" aria-label="Ajuda">❓</button>
+        <button id="btnFullscreen" class="icon-btn" title="Modo Tela Cheia" aria-label="Tela Cheia">⛶</button>
       </div>
     </header>
 
@@ -54,143 +53,85 @@
         <span class="spec-badge price">APENAS R$ 10,00</span>
       </div>
 
-      <div class="flyer-tags">
-        <span class="tag-item"><span class="star">✦</span> SORTE + ARTE = TATTOO NOVA</span>
-        <span class="tag-item"><span class="star">✦</span> PRÊMIO: 1 TATTOO DA SUA ESCOLHA</span>
-        <span class="tag-item"><span class="star">✦</span> VALOR DA RIFA: R$ 10,00</span>
-      </div>
+      <p class="prize-tag">
+        <span>✦</span> PRÊMIO: 1 TATTOO DA SUA ESCOLHA <span>✦</span>
+      </p>
     </div>
 
-    <!-- Main Studio Layout -->
-    <main class="studio-grid">
+    <!-- Main Roulette Stage -->
+    <main class="roulette-stage">
+      
+      <!-- Live HUD indicator -->
+      <div class="live-hud" id="liveHud">
+        <span class="hud-label">APONTANDO:</span>
+        <div class="hud-number" id="hudNumber">--</div>
+      </div>
 
-      <!-- LEFT: Roulette Stage -->
-      <section class="roulette-stage">
-        
-        <!-- Live HUD indicator -->
-        <div class="live-hud" id="liveHud">
-          <span class="hud-label">APONTANDO:</span>
-          <div class="hud-number" id="hudNumber">--</div>
-          <div class="hud-participant" id="hudParticipant">Pronto para girar</div>
+      <!-- Wheel Canvas Wrapper -->
+      <div class="wheel-wrapper">
+        <canvas id="rouletteCanvas"></canvas>
+      </div>
+
+      <!-- Spin Controls -->
+      <div class="spin-actions">
+        <button id="btnSpin" class="btn-spin" type="button">
+          <span>👑 GIRAR ROLETA 👑</span>
+        </button>
+
+        <div class="spin-options">
+          <label class="option-toggle" title="Não repete números que já saíram">
+            <input type="checkbox" id="excludeWinnersToggle" checked>
+            <span>Não repetir já sorteados</span>
+          </label>
         </div>
-
-        <!-- Wheel Canvas -->
-        <div class="wheel-wrapper">
-          <canvas id="rouletteCanvas" width="600" height="600"></canvas>
-        </div>
-
-        <!-- Spin Trigger & Options -->
-        <div class="spin-actions">
-          <button id="btnSpin" class="btn-spin" type="button">
-            <span>👑 GIRAR ROLETA 👑</span>
-          </button>
-
-          <div class="spin-options">
-            <label class="option-toggle" title="Sorteia somente quem comprou e tem nome cadastrado">
-              <input type="checkbox" id="onlySoldToggle">
-              <span>Sortear apenas números comprados</span>
-            </label>
-
-            <label class="option-toggle" title="Não sorteia números que já saíram nesta sessão">
-              <input type="checkbox" id="excludeWinnersToggle" checked>
-              <span>Excluir já sorteados</span>
-            </label>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- RIGHT: Participants & Numbers Grid -->
-      <aside class="board-panel">
-        
-        <div class="board-header">
-          <h2 class="board-title">
-            <span>🎯</span> NÚMEROS (01 A 60)
-          </h2>
-          <span class="board-count" id="boardCount">0 / 60</span>
-        </div>
-
-        <div class="board-actions">
-          <button id="btnFillDemo" class="action-pill-btn" type="button">⚡ Preencher Demo</button>
-          <button id="btnClearAll" class="action-pill-btn" type="button">🗑️ Limpar Todos</button>
-        </div>
-
-        <!-- Grid of 60 Circular Badges -->
-        <div class="numbers-grid" id="numbersGrid">
-          <!-- Dynamically populated 01 to 60 -->
-        </div>
-
-        <!-- Legend -->
-        <div class="board-legend">
-          <div class="legend-item">
-            <span class="legend-dot free"></span>
-            <span>Disponível</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot sold"></span>
-            <span>Comprado</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot win"></span>
-            <span>Ganhador</span>
-          </div>
-        </div>
-
-      </aside>
+      </div>
 
     </main>
 
-    <!-- Winner History Section -->
-    <section class="history-section">
-      <h3 class="history-header">
-        <span>🏆</span> HISTÓRICO DE GANHADORES
-      </h3>
-      <div class="history-list" id="historyList">
-        <!-- Injected dynamically -->
+    <!-- Numbers Board (01 a 60) -->
+    <section class="board-panel">
+      <div class="board-header">
+        <h2 class="board-title">
+          <span>🎯</span> PLACAR (01 A 60)
+        </h2>
+        <div class="board-header-right">
+          <span class="board-count" id="boardCount">0 SORTEADOS</span>
+          <button id="btnResetDrawn" class="reset-pill-btn" type="button" title="Reiniciar números sorteados">🔄 Zerar</button>
+        </div>
+      </div>
+
+      <!-- 10x6 Grid -->
+      <div class="numbers-grid" id="numbersGrid">
+        <!-- Injected dynamically 01 to 60 -->
+      </div>
+
+      <!-- Legend -->
+      <div class="board-legend">
+        <div class="legend-item">
+          <span class="legend-dot in-game"></span>
+          <span>Disponível</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot drawn"></span>
+          <span>Sorteado</span>
+        </div>
       </div>
     </section>
 
-    <!-- Studio Footer -->
+    <!-- Footer -->
     <footer class="studio-footer">
       <div class="footer-steps">
-        <span>1. Escolha sua Tattoo</span>
+        <span>Sorte</span>
         <span>•</span>
-        <span>2. Compre seu número</span>
+        <span>Arte</span>
         <span>•</span>
-        <span>3. Boa Sorte!</span>
+        <span>Tattoo Nova</span>
       </div>
       <div class="artist-signature">
         <span>👑</span> Rossi.tattoo <span>👑</span>
       </div>
     </footer>
 
-  </div>
-
-  <!-- MODAL: Participant Edit -->
-  <div class="modal-overlay" id="participantModal">
-    <div class="modal-box">
-      <button class="modal-close" id="modalCloseBtn" aria-label="Fechar">&times;</button>
-      <h3 class="modal-title" id="modalNumberBadge">NÚMERO 01</h3>
-      <p style="color: var(--text-dim); font-size: 0.85rem;">Cadastre ou edite o comprador deste número na rifa.</p>
-
-      <form onsubmit="event.preventDefault();">
-        <div class="form-group">
-          <label for="inputBuyerName">Nome do Participante</label>
-          <input type="text" id="inputBuyerName" placeholder="Ex: Amanda Silva" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-          <label for="inputBuyerContact">Contato / Instagram</label>
-          <input type="text" id="inputBuyerContact" placeholder="Ex: @amanda.tattoo ou (11) 99999-9999" autocomplete="off">
-        </div>
-
-        <div class="modal-btn-row">
-          <button type="button" class="btn-danger" id="btnDeleteParticipant" title="Remover comprador">Excluir</button>
-          <button type="button" class="btn-secondary" id="btnCancelParticipant">Cancelar</button>
-          <button type="button" class="btn-primary" id="btnSaveParticipant">Salvar</button>
-        </div>
-      </form>
-    </div>
   </div>
 
   <!-- MODAL: Winner Celebration -->
@@ -200,45 +141,24 @@
       
       <div class="winner-crown">👑</div>
       <div class="winner-subtitle">TEMOS UM VENCEDOR!</div>
-      <h2 class="winner-title">RIFA TATTOO</h2>
+      <h2 class="winner-title">NÚMERO SORTEADO</h2>
 
       <div class="winner-badge-giant">
         <span class="big-num" id="winnerBigNum">00</span>
       </div>
 
       <div class="winner-details">
-        <div class="winner-buyer-name" id="winnerBuyerName">Nome do Ganhador</div>
-        <div class="winner-buyer-contact" id="winnerBuyerContact">@instagram</div>
         <div class="winner-prize-banner">PRÊMIO: 1 TATTOO DA SUA ESCOLHA!</div>
+        <div class="winner-meta" id="winnerMeta">Sorteio Oficial • Rossi Tattoo</div>
       </div>
 
       <div class="winner-actions">
         <button id="btnDownloadStory" class="btn-download-story" type="button">
           <span>📸</span> BAIXAR STORY PRO INSTAGRAM (9:16)
         </button>
-        <button id="btnNewSpin" class="btn-primary" type="button" style="width: 100%;">
-          CONTINUAR SORTEIO
+        <button id="btnNewSpin" class="btn-primary" type="button">
+          CONTINUAR
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Instructions & GitHub Hosting Guide -->
-  <div class="modal-overlay" id="infoModal">
-    <div class="modal-box" style="max-width: 520px;">
-      <button class="modal-close" id="infoCloseBtn" aria-label="Fechar">&times;</button>
-      <h3 class="modal-title"><span>ℹ️</span> Como Usar a Roleta</h3>
-      
-      <div style="font-size: 0.88rem; line-height: 1.6; color: #e9d5ff; margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
-        <p><strong>1. Cadastro de Participantes:</strong> Clique em qualquer círculo de 01 a 60 para colocar o nome e @ do comprador. Tudo é salvo automaticamente no seu navegador.</p>
-        <p><strong>2. Modo Live no Instagram:</strong> Use o botão <strong>⛶ (Tela Cheia)</strong> no topo para uma transmissão limpa sem barras do navegador.</p>
-        <p><strong>3. Opções de Sorteio:</strong> Se você vender apenas parte dos números (ex: 45 números), marque <em>"Sortear apenas números comprados"</em> para a roleta nunca cair em número vago!</p>
-        <p><strong>4. Stories Automático:</strong> Ao sair o vencedor, clique em <em>"Baixar Story pro Instagram"</em> para salvar uma arte oficial em alta definição pronta para postar nos stories!</p>
-        <p><strong>5. Como hospedar no GitHub:</strong> Este projeto é 100% estático. Basta subir os arquivos para um repositório no GitHub e ativar o <strong>GitHub Pages</strong> na aba <em>Settings > Pages</em>!</p>
-      </div>
-
-      <div style="margin-top: 20px; text-align: right;">
-        <button type="button" class="btn-primary" onclick="document.getElementById('infoModal').classList.remove('active')">Entendido!</button>
       </div>
     </div>
   </div>
