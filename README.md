@@ -10,6 +10,11 @@ Pronta para ser hospedada gratuitamente no **GitHub Pages** e 100% responsiva pa
 
 - **100% Otimizado para Celulares e Computadores**:
   - Layout mobile-first responsivo e fluido, com tamanho ideal para telas de smartphones (iPhone, Android) e transmissões ao vivo.
+- **🔒 Sorteio Único Definitivo (Uso Único e Imutável na Nuvem)**:
+  - **Funciona apenas 1 VEZ e NUNCA MAIS**: Criada para garantir 100% de honestidade e transparência na rifa, sem margem para desconfiança ou manipulação.
+  - **Sincronização Global via Google Cloud Firestore**: Ao girar, o resultado é cravado imediatamente na nuvem. Ninguém no mundo consegue girar novamente, mesmo abrindo em outro computador, celular ou guia anônima.
+  - **Blindagem Anti-Fraude**: Regras de segurança do Google Firestore no padrão *write-once* (`allow create: if true; allow update, delete: if false`). Uma vez criado, o resultado é permanente e não pode ser sobrescrito nem alterado.
+  - **Proteção Anti-F5**: Se alguém tentar recarregar a página (F5) no meio do giro ou depois, a roleta já carrega travada diretamente no número sorteado com o botão desativado exibindo `🔒 SORTEIO REALIZADO 🔒`.
 - **Roleta Dinâmica de 60 Números (01 a 60)**:
   - Todos os 60 números ativos no giro!
   - Renderizada em HTML5 Canvas de alta resolução (compatível com telas Retina e 4K).
@@ -21,12 +26,6 @@ Pronta para ser hospedada gratuitamente no **GitHub Pages** e 100% responsiva pa
   - Sub-grave de tensão no disparo.
   - Fanfarra triunfal com acordes de sintetizador na revelação do ganhador.
   - Zero arquivos `.mp3` externos (nunca quebra no GitHub Pages!).
-- **Placar Interativo (01 a 60)**:
-  - Grid 10x6 de círculos neon idêntico ao panfleto oficial da rifa.
-  - Marca automaticamente os números que já foram sorteados em dourado com brilho comemorativo.
-  - Botão "🔄 Zerar" para reiniciar os sorteios quando quiser.
-- **Filtro "Não repetir já sorteados"**:
-  - Garante que o mesmo número não saia duas vezes (ideal se forem sortear 1º, 2º ou 3º lugar).
 - **Gerador Automático de Stories para Instagram (9:16)**:
   - Ao sair o ganhador, basta clicar em *"Baixar Story pro Instagram"*.
   - Cria instantaneamente uma imagem em 1080x1920 HD com o número vencedor e a arte oficial da Rossi Tattoo pronta para postar nos stories!

@@ -3,8 +3,26 @@
  * Mobile-First, procedural sound effects, confetti explosion, and Instagram Stories card generator.
  */
 
+// ==========================================================================
+// 1. CONFIGURAÇÃO DA NUVEM (Google Cloud Firestore)
+// ==========================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAJXyJa1_f_1VuKVzRWFS1r1Fb6o69-J7Q",
+  authDomain: "roletapedrao.firebaseapp.com",
+  databaseURL: "https://roletapedrao-default-rtdb.firebaseio.com",
+  projectId: "roletapedrao",
+  storageBucket: "roletapedrao.firebasestorage.app",
+  messagingSenderId: "921253886467",
+  appId: "1:921253886467:web:c9eb285a6cb983c158ec36"
+};
+
+// Documento oficial no Firestore (corresponde exatamente à regra de segurança publicada)
+const FIRESTORE_COLLECTION = "raffles";
+const FIRESTORE_DOC_ID = "tattoo_v1";
+
 document.addEventListener('DOMContentLoaded', () => {
   const TOTAL_NUMBERS = 60;
+  const STORAGE_KEY = 'rossi_tattoo_raffle_v1';
   let latestWinnerNumber = null;
 
   // DOM Elements
@@ -19,6 +37,69 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnNewSpin = document.getElementById('btnNewSpin');
   const btnSoundToggle = document.getElementById('btnSoundToggle');
   const btnFullscreen = document.getElementById('btnFullscreen');
+
+  // Firebase Firestore Setup
+  let firestoreDb = null;
+  let raffleDocRef = null;
+
+  try {
+    if (typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      firestoreDb = firebase.firestore();
+      raffleDocRef = firestoreDb.collection(FIRESTORE_COLLECTION).doc(FIRESTORE_DOC_ID);
+    }
+  } catch (err) {
+    console.warn('Aviso ao conectar no Cloud Firestore:', err);
+  }
+
+  function getSavedDraw() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (data && typeof data.winner === 'number' && data.winner >= 1 && data.winner <= TOTAL_NUMBERS) {
+        return data;
+      }
+    } catch (e) {
+      console.warn('Erro ao carregar sorteio salvo:', e);
+    }
+    return null;
+  }
+
+  function saveDraw(winnerNum, extraData = {}) {
+    try {
+      const data = {
+        winner: winnerNum,
+        timestamp: extraData.timestamp || Date.now(),
+        dateFormatted: extraData.dateFormatted || new Date().toLocaleString('pt-BR')
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.warn('Erro ao salvar resultado:', e);
+    }
+  }
+
+  function applyLockedState(savedData) {
+    const num = savedData.winner;
+    latestWinnerNumber = num;
+    wheel.isLocked = true;
+    wheel.setNumber(num);
+
+    const formatted = num < 10 ? `0${num}` : `${num}`;
+    hudNumber.textContent = formatted;
+
+    btnSpin.disabled = true;
+    btnSpin.innerHTML = '<span>🔒 SORTEIO REALIZADO 🔒</span>';
+    btnSpin.title = 'Este sorteio é único e já foi realizado.';
+
+    if (btnNewSpin) {
+      btnNewSpin.textContent = 'FECHAR';
+    }
+
+    winnerBigNum.textContent = formatted;
+  }
 
   // 1. Initialize Particles Background
   initParticlesCanvas();
@@ -45,21 +126,102 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 3. Spin Button Handler (Pure 01 to 60 Raffle)
-  btnSpin.addEventListener('click', () => {
+  // Check Local Storage on Startup (instant display)
+  const initialDraw = getSavedDraw();
+  if (initialDraw) {
+    applyLockedState(initialDraw);
+  }
+
+  // Real-time Cloud Sync Listener (Firestore)
+  if (raffleDocRef) {
+    raffleDocRef.onSnapshot((docSnapshot) => {
+      if (docSnapshot && docSnapshot.exists) {
+        const cloudData = docSnapshot.data();
+        if (cloudData && typeof cloudData.winner === 'number') {
+          saveDraw(cloudData.winner, cloudData);
+          if (!wheel.isSpinning) {
+            applyLockedState(cloudData);
+          }
+        }
+      } else if (docSnapshot && !docSnapshot.exists) {
+        // Se a nuvem ainda não tem sorteio gravado, garante que a tela esteja liberada
+        localStorage.removeItem(STORAGE_KEY);
+        wheel.isLocked = false;
+        latestWinnerNumber = null;
+        btnSpin.disabled = false;
+        btnSpin.innerHTML = '<span>👑 GIRAR ROLETA 👑</span>';
+      }
+    }, (error) => {
+      console.warn('Aviso no monitoramento em tempo real do Firestore:', error);
+    });
+  }
+
+  // 3. Spin Button Handler (Strict Single-Use Raffle with Cloud Lock)
+  btnSpin.addEventListener('click', async () => {
+    // If already locked, clicking reopens modal to view result or download story
+    if (wheel.isLocked || latestWinnerNumber !== null) {
+      if (latestWinnerNumber) {
+        winnerBigNum.textContent = latestWinnerNumber < 10 ? `0${latestWinnerNumber}` : `${latestWinnerNumber}`;
+        winnerModal.classList.add('active');
+      }
+      return;
+    }
+
     if (wheel.isSpinning) return;
 
-    // Pick random target from 1 to 60
+    // Pick genuinely random target from 1 to 60
     const targetNumber = Math.floor(Math.random() * TOTAL_NUMBERS) + 1;
+    const drawData = {
+      winner: targetNumber,
+      timestamp: Date.now(),
+      dateFormatted: new Date().toLocaleString('pt-BR')
+    };
 
+    // Start spin immediately without waiting for network roundtrip (zero lag/freeze)
+    saveDraw(targetNumber, drawData);
+    startSpinExecution(targetNumber, drawData);
+
+    // Sync with Cloud Firestore in background during spin animation
+    if (raffleDocRef) {
+      raffleDocRef.set(drawData).then(() => {
+        console.log('Sorteio gravado com sucesso no Cloud Firestore!');
+      }).catch((err) => {
+        console.warn('Aviso ao sincronizar no Firestore:', err);
+      });
+    }
+  });
+
+  function startSpinExecution(targetNumber, drawData) {
     btnSpin.disabled = true;
     btnSpin.innerHTML = '<span>⚡ GIRANDO... ⚡</span>';
 
     wheel.spinTo(targetNumber, () => {
-      btnSpin.disabled = false;
-      btnSpin.innerHTML = '<span>👑 GIRAR ROLETA 👑</span>';
+      applyLockedState(drawData);
     });
-  });
+  }
+
+  // Allow clicking on HUD or spin container when locked to reopen the winner story modal
+  const liveHud = document.getElementById('liveHud');
+  if (liveHud) {
+    liveHud.style.cursor = 'pointer';
+    liveHud.addEventListener('click', () => {
+      if (wheel.isLocked && latestWinnerNumber) {
+        winnerBigNum.textContent = latestWinnerNumber < 10 ? `0${latestWinnerNumber}` : `${latestWinnerNumber}`;
+        winnerModal.classList.add('active');
+      }
+    });
+  }
+
+  const spinActions = document.querySelector('.spin-actions');
+  if (spinActions) {
+    spinActions.addEventListener('click', () => {
+      if (wheel.isLocked && latestWinnerNumber) {
+        winnerBigNum.textContent = latestWinnerNumber < 10 ? `0${latestWinnerNumber}` : `${latestWinnerNumber}`;
+        winnerModal.classList.add('active');
+      }
+    });
+  }
+
 
   // 4. Winner Announcement & Celebration
   function handleWinnerAnnounce(num) {

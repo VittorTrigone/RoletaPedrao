@@ -13,6 +13,7 @@ class RouletteWheel {
 
     this.rotation = 0;
     this.isSpinning = false;
+    this.isLocked = false;
     this.lastPegIndex = -1;
     this.flipperAngle = 0;
 
@@ -191,8 +192,16 @@ class RouletteWheel {
     ctx.restore();
   }
 
+  setNumber(targetNumber) {
+    const sliceAngle = this.getSliceAngle();
+    const targetIndex = targetNumber - 1;
+    const sliceCenter = (targetIndex + 0.5) * sliceAngle;
+    this.rotation = -Math.PI / 2 - sliceCenter;
+    this.draw();
+  }
+
   spinTo(targetNumber, onComplete) {
-    if (this.isSpinning) return;
+    if (this.isSpinning || this.isLocked) return;
     this.isSpinning = true;
 
     if (window.soundEngine) {
