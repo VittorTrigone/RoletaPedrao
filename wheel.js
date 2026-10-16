@@ -260,31 +260,28 @@ class RouletteWheel {
     ctx.fill();
     ctx.stroke();
 
+    // Crown only, perfectly centered
     ctx.shadowBlur = 0;
-    ctx.font = `${Math.round(radius * 0.13)}px sans-serif`;
+    ctx.font = `${Math.round(radius * 0.17)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('👑', 0, -4);
-
-    ctx.font = `bold ${Math.round(radius * 0.05)}px Montserrat, sans-serif`;
-    ctx.fillStyle = '#f5d0fe';
-    ctx.fillText('ROSSI', 0, radius * 0.12);
+    ctx.fillText('👑', 0, 1);
     ctx.restore();
 
-    // 4. Pointer / Flipper at 12 o'clock
+    // 4. Pointer / Flipper at 12 o'clock (Positioned above the wheel, with only the tip on the board)
     ctx.save();
-    ctx.translate(centerX, centerY - radius + 2);
+    ctx.translate(centerX, centerY - radius - 5);
     ctx.rotate(this.flipperAngle);
 
     ctx.beginPath();
-    ctx.moveTo(0, 16);
-    ctx.lineTo(-9, -8);
-    ctx.lineTo(9, -8);
+    ctx.moveTo(0, 12); // Tip dips just barely onto the outer rim pegs
+    ctx.lineTo(-8, -10);
+    ctx.lineTo(8, -10);
     ctx.closePath();
 
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = '#ec4899';
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = 12;
     ctx.fill();
 
     ctx.strokeStyle = '#a855f7';
@@ -292,7 +289,7 @@ class RouletteWheel {
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(0, -5, 3, 0, Math.PI * 2);
+    ctx.arc(0, -6, 2.6, 0, Math.PI * 2);
     ctx.fillStyle = '#d946ef';
     ctx.fill();
 
