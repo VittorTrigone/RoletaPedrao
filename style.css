@@ -265,7 +265,7 @@ body {
 .wheel-wrapper {
   position: relative;
   width: 100%;
-  max-width: 410px;
+  max-width: 450px;
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;

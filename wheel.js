@@ -199,26 +199,21 @@ class RouletteWheel {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Number text
+      // Number text placed at the edge/tip of the roulette wheel (ponta da roleta)
       ctx.save();
       const textAngle = startAngle + sliceAngle / 2;
       ctx.rotate(textAngle);
 
-      const textDist = radius * 0.77;
+      const textDist = radius * 0.89;
       ctx.translate(textDist, 0);
       ctx.rotate(Math.PI / 2);
 
       const numStr = num < 10 ? `0${num}` : `${num}`;
 
-      if (isDrawn) {
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = 'bold 10px Montserrat, sans-serif';
-      } else {
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px Montserrat, sans-serif';
-        ctx.shadowColor = '#d946ef';
-        ctx.shadowBlur = 5;
-      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9.5px Montserrat, sans-serif';
+      ctx.shadowColor = '#d946ef';
+      ctx.shadowBlur = 4;
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -231,7 +226,7 @@ class RouletteWheel {
       const pegY = Math.sin(startAngle) * (radius - 2);
       ctx.beginPath();
       ctx.arc(pegX, pegY, 2, 0, Math.PI * 2);
-      ctx.fillStyle = isDrawn ? '#fbbf24' : '#e9d5ff';
+      ctx.fillStyle = '#e9d5ff';
       ctx.shadowColor = '#a855f7';
       ctx.shadowBlur = 3;
       ctx.fill();
@@ -278,13 +273,13 @@ class RouletteWheel {
 
     // 4. Pointer / Flipper at 12 o'clock
     ctx.save();
-    ctx.translate(centerX, centerY - radius + 4);
+    ctx.translate(centerX, centerY - radius + 2);
     ctx.rotate(this.flipperAngle);
 
     ctx.beginPath();
-    ctx.moveTo(0, 20);
-    ctx.lineTo(-10, -10);
-    ctx.lineTo(10, -10);
+    ctx.moveTo(0, 16);
+    ctx.lineTo(-9, -8);
+    ctx.lineTo(9, -8);
     ctx.closePath();
 
     ctx.fillStyle = '#ffffff';
