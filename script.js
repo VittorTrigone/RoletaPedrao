@@ -1,22 +1,15 @@
 /**
- * Rossi Tattoo - Raffle Roulette Logic (Mobile-Optimized & Pure Numbers)
- * Handles 60 numbers roulette, drawn state persistence, sound effects, confetti, and Instagram Stories generator.
+ * Rossi Tattoo - Raffle Roulette Logic (Single Spin • Pure Numbers 01 to 60)
+ * Mobile-First, procedural sound effects, confetti explosion, and Instagram Stories card generator.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   const TOTAL_NUMBERS = 60;
-  const STORAGE_KEY_DRAWN = 'rossi_tattoo_drawn_numbers_v2';
-
-  let drawnNumbers = loadDrawnNumbers();
   let latestWinnerNumber = null;
 
   // DOM Elements
   const btnSpin = document.getElementById('btnSpin');
   const hudNumber = document.getElementById('hudNumber');
-  const numbersGrid = document.getElementById('numbersGrid');
-  const boardCount = document.getElementById('boardCount');
-  const excludeWinnersToggle = document.getElementById('excludeWinnersToggle');
-  const btnResetDrawn = document.getElementById('btnResetDrawn');
 
   // Modals & Controls
   const winnerModal = document.getElementById('winnerModal');
@@ -33,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Initialize Roulette Wheel
   const wheel = new RouletteWheel('rouletteCanvas', {
     totalNumbers: TOTAL_NUMBERS,
-    drawnNumbers: drawnNumbers,
     onTick: (speedRatio) => {
       if (window.soundEngine) {
         window.soundEngine.playTick(speedRatio);
@@ -42,44 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
     onNumberPass: (num) => {
       const formatted = num < 10 ? `0${num}` : `${num}`;
       hudNumber.textContent = formatted;
-
-      // Micro-highlight badge in 10x6 grid
-      const chip = document.querySelector(`.number-chip[data-num="${num}"]`);
-      if (chip) {
-        document.querySelectorAll('.number-chip.highlight').forEach(c => c.classList.remove('highlight'));
-        chip.classList.add('highlight');
-      }
     },
     onFinish: (winnerNum) => {
       handleWinnerAnnounce(winnerNum);
     }
   });
 
-  // Render initial grid
-  renderBoard();
-
-  // 3. Spin Button Handler
+  // 3. Spin Button Handler (Pure 01 to 60 Raffle)
   btnSpin.addEventListener('click', () => {
     if (wheel.isSpinning) return;
 
-    const excludeWinners = excludeWinnersToggle.checked;
-    let pool = [];
-
-    for (let i = 1; i <= TOTAL_NUMBERS; i++) {
-      if (excludeWinners && drawnNumbers.includes(i)) {
-        continue;
-      }
-      pool.push(i);
-    }
-
-    if (pool.length === 0) {
-      showToast('⚠️ Todos os 60 números já foram sorteados! Clique em Zerar para recomeçar.');
-      return;
-    }
-
-    // Pick random target from pool
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    const targetNumber = pool[randomIndex];
+    // Pick random target from 1 to 60
+    const targetNumber = Math.floor(Math.random() * TOTAL_NUMBERS) + 1;
 
     btnSpin.disabled = true;
     btnSpin.innerHTML = '<span>⚡ GIRANDO... ⚡</span>';
@@ -94,14 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleWinnerAnnounce(num) {
     latestWinnerNumber = num;
     const formatted = num < 10 ? `0${num}` : `${num}`;
-
-    // Add to drawn numbers
-    if (!drawnNumbers.includes(num)) {
-      drawnNumbers.push(num);
-      saveDrawnNumbers(drawnNumbers);
-      wheel.setDrawnNumbers(drawnNumbers);
-      renderBoard();
-    }
 
     // Play Victory Fanfare
     if (window.soundEngine) {
@@ -145,43 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return Math.random() * (max - min) + min;
   }
 
-  // 5. Render Numbers Board (10x6 Grid)
-  function renderBoard() {
-    numbersGrid.innerHTML = '';
-
-    for (let i = 1; i <= TOTAL_NUMBERS; i++) {
-      const formatted = i < 10 ? `0${i}` : `${i}`;
-      const isDrawn = drawnNumbers.includes(i);
-
-      const chip = document.createElement('div');
-      chip.className = 'number-chip';
-      chip.dataset.num = i;
-
-      if (isDrawn) {
-        chip.classList.add('drawn');
-        chip.title = `Número ${formatted} (Já Sorteado)`;
-      }
-
-      chip.innerHTML = `<span class="num-text">${formatted}</span>`;
-      numbersGrid.appendChild(chip);
-    }
-
-    boardCount.textContent = `${drawnNumbers.length} / ${TOTAL_NUMBERS}`;
-  }
-
-  // 6. Reset Drawn Numbers
-  btnResetDrawn.addEventListener('click', () => {
-    if (drawnNumbers.length === 0) {
-      showToast('Nenhum número sorteado para zerar.');
-      return;
-    }
-    drawnNumbers = [];
-    saveDrawnNumbers(drawnNumbers);
-    wheel.setDrawnNumbers(drawnNumbers);
-    renderBoard();
-    showToast('Placar de sorteios zerado! 🔄');
-  });
-
   // Modal Closures
   winnerCloseBtn.addEventListener('click', () => winnerModal.classList.remove('active'));
   btnNewSpin.addEventListener('click', () => winnerModal.classList.remove('active'));
@@ -189,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === winnerModal) winnerModal.classList.remove('active');
   });
 
-  // 7. Instagram Story Card Generator (1080x1920 9:16)
+  // 5. Instagram Story Card Generator (1080x1920 9:16)
   btnDownloadStory.addEventListener('click', () => {
     if (!latestWinnerNumber) return;
     const formatted = latestWinnerNumber < 10 ? `0${latestWinnerNumber}` : `${latestWinnerNumber}`;
@@ -235,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ctx.fillStyle = '#d8b4fe';
     ctx.font = 'bold 36px Montserrat, sans-serif';
-    ctx.fillText('60 NÚMEROS • APENAS R$ 10,00', 540, 520);
+    ctx.fillText('60 NÚMEROS • SORTEIO AO VIVO', 540, 520);
 
     // Giant Winner Circle
     const badgeY = 900;
@@ -297,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Story baixado com sucesso! 📸');
   });
 
-  // 8. Sound & Fullscreen Controls
+  // 6. Sound & Fullscreen Controls
   btnSoundToggle.addEventListener('click', () => {
     if (window.soundEngine) {
       const isMuted = window.soundEngine.toggleMute();
@@ -333,23 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, duration);
   }
 
-  // LocalStorage Helpers
-  function loadDrawnNumbers() {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY_DRAWN);
-      return data ? JSON.parse(data) : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function saveDrawnNumbers(data) {
-    try {
-      localStorage.setItem(STORAGE_KEY_DRAWN, JSON.stringify(data));
-    } catch (e) {}
-  }
-
-  // 9. Floating Embers Background
+  // 7. Floating Embers Background
   function initParticlesCanvas() {
     const pCanvas = document.getElementById('fx-canvas');
     if (!pCanvas) return;

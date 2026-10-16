@@ -1,12 +1,12 @@
 /* ==========================================================================
    ROSSI TATTOO - ROLETA DA RIFA (01 A 60)
-   Mobile-First • Dark Grunge + Neon Purple Tattoo Aesthetic
+   Mobile-First • Single-Screen • Dark Grunge + Neon Purple Aesthetic
    ========================================================================== */
 
 :root {
   --bg-deep: #07040a;
-  --bg-card: rgba(18, 9, 32, 0.85);
-  --bg-card-border: rgba(168, 85, 247, 0.38);
+  --bg-card: rgba(18, 9, 32, 0.88);
+  --bg-card-border: rgba(168, 85, 247, 0.4);
   --neon-purple: #a855f7;
   --neon-purple-glow: #c084fc;
   --neon-magenta: #e879f9;
@@ -30,13 +30,14 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* Background Atmosphere */
+/* Background Atmospheric Layers */
 .bg-layer {
   position: fixed;
   inset: 0;
@@ -64,36 +65,38 @@ body {
   pointer-events: none;
 }
 
-/* App Container - Centered and Mobile First */
+/* App Container - Fits perfectly on mobile screens without scrolling */
 .app-container {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 600px; /* Perfect smartphone & tablet column width */
+  max-width: 520px;
   margin: 0 auto;
-  padding: 12px 16px 50px 16px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 12px 16px 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  justify-content: space-between;
 }
 
-/* Top Bar */
+/* Top Action Bar */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 6px;
+  padding: 2px 4px;
 }
 
 .brand-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 5px 12px;
   background: rgba(168, 85, 247, 0.15);
   border: 1px solid rgba(168, 85, 247, 0.4);
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -110,13 +113,13 @@ body {
   background: rgba(24, 11, 40, 0.8);
   border: 1px solid rgba(168, 85, 247, 0.4);
   color: var(--text-primary);
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   cursor: pointer;
   transition: all 0.2s ease;
   backdrop-filter: blur(8px);
@@ -138,13 +141,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  margin-top: 4px;
 }
 
 .sub-banner {
   font-family: var(--font-hand);
   color: #e9d5ff;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   letter-spacing: 2px;
   text-transform: uppercase;
   text-shadow: 0 0 10px rgba(192, 132, 252, 0.7);
@@ -166,7 +170,7 @@ body {
 
 .main-title {
   font-family: var(--font-tattoo);
-  font-size: clamp(2.4rem, 9vw, 3.6rem);
+  font-size: clamp(2.3rem, 8.5vw, 3.4rem);
   text-transform: uppercase;
   letter-spacing: 3px;
   color: #ffffff;
@@ -185,33 +189,24 @@ body {
   margin-top: 2px;
 }
 
-.spec-badge {
+.spec-badge.numbers {
   font-family: var(--font-tattoo);
   font-size: 1.15rem;
-  padding: 4px 14px;
+  padding: 3px 16px;
   border-radius: 8px;
-  letter-spacing: 1px;
-}
-
-.spec-badge.numbers {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-}
-
-.spec-badge.price {
-  background: rgba(168, 85, 247, 0.28);
+  letter-spacing: 1.5px;
+  background: rgba(168, 85, 247, 0.25);
   border: 1.5px solid var(--neon-purple);
-  color: #f5d0fe;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
 }
 
 .prize-tag {
   color: #d8b4fe;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .prize-tag span {
@@ -223,15 +218,16 @@ body {
    ========================================================================== */
 .roulette-stage {
   background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  border-radius: 24px;
-  padding: 18px 14px;
+  border: 1.5px solid var(--bg-card-border);
+  border-radius: 26px;
+  padding: 16px 14px 20px 14px;
   backdrop-filter: blur(14px);
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), inset 0 0 25px rgba(168, 85, 247, 0.1);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75), inset 0 0 30px rgba(168, 85, 247, 0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  margin: 6px 0;
 }
 
 /* Live Number HUD */
@@ -239,11 +235,11 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 18px;
+  padding: 5px 18px;
   background: rgba(12, 4, 20, 0.9);
   border: 1.5px solid rgba(168, 85, 247, 0.45);
   border-radius: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
 }
 
@@ -265,16 +261,16 @@ body {
   text-shadow: 0 0 12px #c084fc;
 }
 
-/* Wheel Canvas Wrapper - Sized to fill mobile screen cleanly */
+/* Wheel Canvas Wrapper */
 .wheel-wrapper {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 410px;
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4px 0 14px 0;
+  margin: 2px 0 14px 0;
 }
 
 #rouletteCanvas {
@@ -283,30 +279,28 @@ body {
   display: block;
 }
 
-/* Spin Controls */
+/* Spin Button */
 .spin-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .btn-spin {
   width: 100%;
-  padding: 16px 20px;
+  padding: 17px 20px;
   background: linear-gradient(135deg, #9333ea 0%, #c084fc 45%, #7e22ce 100%);
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   color: #ffffff;
   font-family: var(--font-tattoo);
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 35px rgba(168, 85, 247, 0.7), 0 8px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 35px rgba(168, 85, 247, 0.75), 0 8px 20px rgba(0, 0, 0, 0.6);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -324,193 +318,21 @@ body {
   cursor: not-allowed;
 }
 
-.spin-options {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: #e9d5ff;
-}
-
-.option-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.option-toggle input[type="checkbox"] {
-  accent-color: var(--neon-purple);
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-/* ==========================================================================
-   NUMBERS BOARD (10x6 GRID)
-   ========================================================================== */
-.board-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  border-radius: 20px;
-  padding: 16px 14px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.board-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(168, 85, 247, 0.25);
-  padding-bottom: 10px;
-}
-
-.board-title {
-  font-family: var(--font-tattoo);
-  font-size: 1.15rem;
-  letter-spacing: 1px;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.board-header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.board-count {
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  background: rgba(168, 85, 247, 0.2);
-  border: 1px solid rgba(168, 85, 247, 0.45);
-  border-radius: 999px;
-  color: #f5d0fe;
-  font-weight: 700;
-}
-
-.reset-pill-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #e9d5ff;
-  padding: 4px 10px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.reset-pill-btn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #fecaca;
-}
-
-/* 10 Columns Grid */
-.numbers-grid {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 5px;
-  width: 100%;
-}
-
-.number-chip {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 1.5px solid rgba(168, 85, 247, 0.5);
-  background: rgba(18, 7, 33, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  transition: all 0.2s ease;
-}
-
-.number-chip .num-text {
-  font-family: var(--font-tattoo);
-  font-size: 0.85rem;
-  color: #ffffff;
-  line-height: 1;
-}
-
-/* Drawn State (Winner) */
-.number-chip.drawn {
-  border-color: var(--neon-gold);
-  background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
-}
-
-.number-chip.drawn .num-text {
-  color: #fef08a;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* Highlight while spinning */
-.number-chip.highlight {
-  border-color: #38bdf8;
-  transform: scale(1.15);
-  box-shadow: 0 0 14px #38bdf8;
-  background: rgba(14, 165, 233, 0.4);
-  z-index: 5;
-}
-
-/* Legend */
-.board-legend {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  border-top: 1px solid rgba(168, 85, 247, 0.2);
-  padding-top: 8px;
-  font-size: 0.75rem;
-  color: var(--text-dim);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-}
-
-.legend-dot.in-game {
-  border: 1.5px solid var(--neon-purple);
-  background: rgba(168, 85, 247, 0.3);
-}
-
-.legend-dot.drawn {
-  background: var(--neon-gold);
-  box-shadow: 0 0 6px var(--neon-gold);
-}
-
 /* Footer */
 .studio-footer {
   text-align: center;
-  padding: 10px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  padding-bottom: 2px;
 }
 
 .footer-steps {
   display: flex;
   justify-content: center;
-  gap: 14px;
-  font-size: 0.72rem;
+  gap: 12px;
+  font-size: 0.7rem;
   color: #c084fc;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -518,12 +340,12 @@ body {
 
 .artist-signature {
   font-family: var(--font-hand);
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   color: #f3e8ff;
   text-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* ==========================================================================
@@ -532,7 +354,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 2, 8, 0.9);
+  background: rgba(5, 2, 8, 0.92);
   backdrop-filter: blur(14px);
   z-index: 1000;
   display: flex;
@@ -552,12 +374,12 @@ body {
 .winner-modal-box {
   background: radial-gradient(circle at 50% 20%, #290f45 0%, #0c0417 85%);
   border: 2px solid var(--neon-gold);
-  border-radius: 24px;
+  border-radius: 26px;
   padding: 26px 20px;
   width: 100%;
-  max-width: 420px;
+  max-width: 410px;
   text-align: center;
-  box-shadow: 0 0 60px rgba(251, 191, 36, 0.4), 0 0 80px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 60px rgba(251, 191, 36, 0.45), 0 0 80px rgba(168, 85, 247, 0.35);
   position: relative;
   transform: scale(0.9) translateY(20px);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -600,8 +422,8 @@ body {
 }
 
 .winner-badge-giant {
-  width: 130px;
-  height: 130px;
+  width: 136px;
+  height: 136px;
   border-radius: 50%;
   margin: 14px auto;
   background: radial-gradient(circle, #fbbf24 0%, #d97706 70%, #78350f 100%);
@@ -615,7 +437,7 @@ body {
 
 .winner-badge-giant .big-num {
   font-family: var(--font-tattoo);
-  font-size: 4.4rem;
+  font-size: 4.6rem;
   color: #0f051d;
   line-height: 1;
 }
