@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticlesCanvas();
 
   // 2. Initialize Roulette Wheel
+  let lastHudTime = 0;
   const wheel = new RouletteWheel('rouletteCanvas', {
     totalNumbers: TOTAL_NUMBERS,
     onTick: (speedRatio) => {
@@ -32,10 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     },
     onNumberPass: (num) => {
-      const formatted = num < 10 ? `0${num}` : `${num}`;
-      hudNumber.textContent = formatted;
+      const now = performance.now();
+      if (now - lastHudTime > 30) {
+        lastHudTime = now;
+        hudNumber.textContent = num < 10 ? `0${num}` : `${num}`;
+      }
     },
     onFinish: (winnerNum) => {
+      hudNumber.textContent = winnerNum < 10 ? `0${winnerNum}` : `${winnerNum}`;
       handleWinnerAnnounce(winnerNum);
     }
   });
@@ -268,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const particles = [];
-    const count = 30;
+    const count = window.innerWidth < 600 ? 14 : 26;
 
     for (let i = 0; i < count; i++) {
       particles.push({
@@ -301,8 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         pCtx.fillStyle = p.color;
         pCtx.globalAlpha = p.alpha;
-        pCtx.shadowColor = p.color;
-        pCtx.shadowBlur = 8;
         pCtx.fill();
         pCtx.restore();
       });

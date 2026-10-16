@@ -50,6 +50,10 @@ class SoundEngine {
    */
   playTick(speedRatio = 1) {
     if (this.isMuted) return;
+    const now = performance.now ? performance.now() : Date.now();
+    if (this.lastTickTime && now - this.lastTickTime < 35) return;
+    this.lastTickTime = now;
+
     this.ensureContext();
     if (!this.ctx) return;
 
